@@ -1,0 +1,40 @@
+passwd:
+  users:
+    - name: core
+      password_hash: "$6$bT.CKtOX$zUvsBWyE1qK3KUVIk.xyc24dQc605vigJgrti0YyjKpQ1yc6KmYUq8CL6FQ11UC3X45XNvNgJNWNzSaLb.mAq/"
+#TODO auto config network
+networkd:
+  units:
+    - name: static.network
+      contents: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        Address=192.168.3.2/24
+        Gateway=192.168.3.1
+        DNS=192.168.1.1
+etcd:
+  discovery: https://discovery.etcd.io/@param:coreos-cluster-token
+  advertise_client_urls: http://$private_ipv4:2379
+  initial_advertise_peer_urls: http://$private_ipv4:2380
+  listen_client_urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+  listen_peer_urls: http://$private_ipv4:2380,http://$private_ipv4:7001
+systemd:
+  units:
+#    - name: etcd2.service
+#      command: restart
+    - name: cluster-bootstrap.service
+      enable: true
+      contents: |
+        @insert: file:./systemd-units/cluster-bootstrap.service
+locksmith:
+  reboot_strategy: "etcd-lock"
+#TODO? set numer of nodes allowed to rebot https://coreos.com/os/docs/latest/update-strategies.html
+storage:
+  files:
+    - filesystem: root
+      path: /etc/custom-environment
+      contents:
+        inline: |
+          @insert: file:./files/custom-environment

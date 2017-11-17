@@ -55,7 +55,9 @@ Here's how a generation routine would look like these:
 
 3. Editing `./heatit/params.yml` - insert the cluster token generated in step #1 as a value for `coreos-cluster-token` parameter as well as set up Slack notification settings (todo: descripbe Slack setup in more detail)
 
-4. Generate the two cloud-config files in a single command:
+4. Get [Heatit!](https://github.com/pavlo/heatit/releases) tool and save it into the heatit directory.
+
+5. Generate the two cloud-config files in a single command:
 
     ```
     > cd ./heatit; ./generate-configs.sh
@@ -85,9 +87,3 @@ so, given the following is the content of `./manager-systemd-units.txt`:
     vault-sk.service
 
 then each time you provision a new node with master.yml file, or reboot an existing one, it would execute `node-lifecycle.service`, `vault.service` and then `vault-sk.service` on the node. Same applies to worker nodes with the exception is that it would read `./worker-systemd-units.txt` file.
-
-## Tooling
-
-Deprecated: In order to get it up and running you have to have the [Heatit!](https://github.com/pavlo/heatit) tool that is used to compile the  scripts into proper `cloud-config` files. 
-
-todo: Provide direct links to download Heatit! binary
