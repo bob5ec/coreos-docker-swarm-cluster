@@ -3,13 +3,13 @@
 echo "------------------------------"
 echo "BOOTSTRAP FOR $1 IS RUNNING"
 
-while [ "`curl http://${COREOS_PRIVATE_IPV4}:4001/v2/keys/nodes/bootstrapping | jq -r '.node.value'`" != "null" ]; do
+while [ "`etcdctl get nodes/bootstrapping`" == "1" ]; do
   echo "An other node is bootstrapping, waiting 5 seconds..."
   sleep 5
 done
 
 # Set a lock
-etcdctl set /nodes/bootstrapping ${COREOS_PRIVATE_IPV4} --ttl 180
+etcdctl set /nodes/bootstrapping 1 --ttl 180
 
 set -o allexport
 source /etc/custom-environment

@@ -1,6 +1,6 @@
 passwd:
   users:
-    - name: core
+    - name: root
       password_hash: "$6$bT.CKtOX$zUvsBWyE1qK3KUVIk.xyc24dQc605vigJgrti0YyjKpQ1yc6KmYUq8CL6FQ11UC3X45XNvNgJNWNzSaLb.mAq/"
 #TODO auto config network
 networkd:
@@ -15,17 +15,41 @@ networkd:
         Gateway=192.168.3.1
         DNS=192.168.1.1
 etcd:
-  discovery: https://discovery.etcd.io/@param:coreos-cluster-token
-  advertise_client_urls: http://$private_ipv4:2379
-  initial_advertise_peer_urls: http://$private_ipv4:2380
-  listen_client_urls: http://0.0.0.0:2379,http://0.0.0.0:4001
-  listen_peer_urls: http://$private_ipv4:2380,http://$private_ipv4:7001
+# https://coreos.com/os/docs/latest/dynamic-data.html
+#  name: "{HOSTNAME}"
+#  initial_advertise_peer_urls: "http://{PRIVATE_IPV4}:2380"
+#  listen_peer_urls: "http://{PRIVATE_IPV4}:2380"
+#  advertise_client_urls: "http://{PRIVATE_IPV4}:2379"
+#  listen_client_urls: "http://0.0.0.0:2379"
+#  initial_cluster: "{HOSTNAME}=http://{PRIVATE_IPV4}:2380"
+  initial_cluster_state: new
+  initial_cluster_token: dev
+  name: core-1
+  initial_advertise_peer_urls: http://192.168.3.2:2380
+  listen_peer_urls: http://192.168.3.2:2380
+  advertise_client_urls: http://192.168.3.2:2379
+  listen_client_urls: http://0.0.0.0:2379
+  initial_cluster: core-1=http://192.168.3.2:2380
+#data_dir: data.etcd
+#  listen_peer_urls: http://$private_ipv4:2380,http://$private_ipv4:7001
+#  listen_client_urls: http://0.0.0.0:2379,http://0.0.0.0:4001
+#  initial_cluster ${NAME_1}=http://${HOST_1}:2380,${NAME_2}=http://${HOST_2}:2380,${NAME_3}=http://${HOST_3}:2380
+#  discovery: https://discovery.etcd.io/@param:coreos-cluster-token
+#TODO change token per env
 systemd:
   units:
-#    - name: etcd2.service
-#      command: restart
+    - name: etcd-member.service
+      enabled: true
+#        Environment="ETCD_IMAGE_TAG=v3.2.0"
+#        Environment="ETCD_NAME={{.etcd_name}}"
+#        Environment="ETCD_ADVERTISE_CLIENT_URLS=http://$private_ipv4:2379"
+#        Environment="ETCD_INITIAL_ADVERTISE_PEER_URLS=http://$private_ipv4:2380"
+#        Environment="ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379"
+#        Environment="ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380"
+#        Environment="ETCD_INITIAL_CLUSTER={{.etcd_initial_cluster}}"
+#        Environment="ETCD_STRICT_RECONFIG_CHECK=true"
     - name: cluster-bootstrap.service
-      enable: true
+      enabled: true
       contents: |
         @insert: file:./systemd-units/cluster-bootstrap.service
 locksmith:
@@ -35,6 +59,7 @@ storage:
   files:
     - filesystem: root
       path: /etc/custom-environment
+      mode: 755
       contents:
         inline: |
           @insert: file:./files/custom-environment

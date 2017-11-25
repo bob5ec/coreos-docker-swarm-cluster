@@ -1,16 +1,16 @@
 [Unit]
 Description=Cluster Bootstrap
 Requires=docker.service
-Requires=etcd2.service
+Requires=etcd-member.service
 After=docker.service
-After=etcd2.service
+After=etcd-member.service
 
 [Service]
 EnvironmentFile=-/etc/environment
 Type=oneshot
 RemainAfterExit=yes
 ExecStartPre=-/usr/bin/rm -rf /etc/coreos-docker-swarm-cluster
-ExecStartPre=/usr/bin/git clone https://github.com/pavlo/coreos-docker-swarm-cluster.git /etc/coreos-docker-swarm-cluster
+ExecStartPre=/usr/bin/git clone https://github.com/@param:github-user/coreos-docker-swarm-cluster.git /etc/coreos-docker-swarm-cluster
 ExecStart=/etc/coreos-docker-swarm-cluster/bootstrap.sh @param:node-role
 
 [Install]
