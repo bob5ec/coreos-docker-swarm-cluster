@@ -31,15 +31,16 @@ sleep $[ ( $RANDOM % 10 ) + 1 ]s
 
 $cluster_config_dir/tools/join-swarm-cluster.sh $1
 
-unit_files="$cluster_config_dir/$1-systemd-units.txt"
-cat $unit_files | while read unit
-do
-   echo "Starting unit: $unit..."
-   cp -rf $cluster_config_dir/systemd-units/$unit /etc/systemd/system
-   systemctl daemon-reload
-   systemctl start $unit
-   $slack -m "_${COREOS_PRIVATE_IPV4}_: Started unit _${unit}_ on ${COREOS_PRIVATE_IPV4}" -u $SLACK_WEBHOOK_URL -c "#$SLACK_CHANNEL"
-done
+# TODO move the units to ignition and throw away any state on reboot
+#unit_files="$cluster_config_dir/$1-systemd-units.txt"
+#cat $unit_files | while read unit
+#do
+#   echo "Starting unit: $unit..."
+#   cp -rf $cluster_config_dir/systemd-units/$unit /etc/systemd/system
+#   systemctl daemon-reload
+#   systemctl start $unit
+#   $slack -m "_${COREOS_PRIVATE_IPV4}_: Started unit _${unit}_ on ${COREOS_PRIVATE_IPV4}" -u $SLACK_WEBHOOK_URL -c "#$SLACK_CHANNEL"
+#done
 
 
 $slack -m "_${COREOS_PRIVATE_IPV4}_: Bootstrap completed for *$1* node at ${COREOS_PRIVATE_IPV4}!" -u $SLACK_WEBHOOK_URL -c "#$SLACK_CHANNEL"
