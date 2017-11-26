@@ -40,18 +40,14 @@ systemd:
   units:
     - name: etcd-member.service
       enabled: true
-#        Environment="ETCD_IMAGE_TAG=v3.2.0"
-#        Environment="ETCD_NAME={{.etcd_name}}"
-#        Environment="ETCD_ADVERTISE_CLIENT_URLS=http://$private_ipv4:2379"
-#        Environment="ETCD_INITIAL_ADVERTISE_PEER_URLS=http://$private_ipv4:2380"
-#        Environment="ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379"
-#        Environment="ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380"
-#        Environment="ETCD_INITIAL_CLUSTER={{.etcd_initial_cluster}}"
-#        Environment="ETCD_STRICT_RECONFIG_CHECK=true"
     - name: cluster-bootstrap.service
       enabled: true
       contents: |
         @insert: file:./systemd-units/cluster-bootstrap.service
+    - name: deploy.service
+      enabled: true
+      contents: |
+        @insert: file:./systemd-units/deploy.service
 locksmith:
   reboot_strategy: "etcd-lock"
 #TODO? set numer of nodes allowed to rebot https://coreos.com/os/docs/latest/update-strategies.html

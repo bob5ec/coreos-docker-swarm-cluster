@@ -15,6 +15,10 @@ set -o allexport
 source /etc/custom-environment
 set +o allexport
 
+if [ "${COREOS_PRIVATE_IPV4}" == "" ]; then
+  export COREOS_PRIVATE_IPV4=`ifconfig eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+fi
+
 cluster_config_dir=/etc/coreos-docker-swarm-cluster
 slack=$cluster_config_dir/tools/send-message-to-slack.sh
 
