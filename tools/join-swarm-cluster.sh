@@ -3,7 +3,7 @@
 cluster_config_dir=/etc/coreos-docker-swarm-cluster
 slack=$cluster_config_dir/tools/send-message-to-slack.sh
 
-MANAGER_ADVERTISE_ADDR=`etcdctl get nodes/managers`
+MANAGER_ADVERTISE_ADDR=`etcdctl get /nodes/managers`
 
 role=$1
 
@@ -14,6 +14,7 @@ if [ "$role" == "manager" ]; then
     $slack -m "_${COREOS_PRIVATE_IPV4}_: Initiailizing docker swarm cluster" -u $SLACK_WEBHOOK_URL -c "$SLACK_CHANNEL"
     
     docker swarm init --advertise-addr ${COREOS_PRIVATE_IPV4}
+    etcdctl set /nodes/managers ${COREOS_PRIVATE_IPV4}
     etcdctl set /swarm/manager-join-token `docker swarm join-token -q manager`
     etcdctl set /swarm/worker-join-token `docker swarm join-token -q worker`    
   else
@@ -24,7 +25,7 @@ if [ "$role" == "manager" ]; then
 
 elif [ "$role" == "worker" ]; then
 
-  token=`etcdctl get keys/swarm/worker-join-token`
+  token=`etcdctl get /swarm/worker-join-token`
   if [ "$token" == "null" ]; then
     echo "Failed to find join token for a worker node in the swarm cluster!"
     exit -1
