@@ -20,7 +20,7 @@ if [ "$role" == "manager" ]; then
   else
     echo "JOINING DOCKER SWARM..."
     $slack -m "_${COREOS_PRIVATE_IPV4}_: Joining existing docker swarm cluster as $role" -u $SLACK_WEBHOOK_URL -c "$SLACK_CHANNEL"
-    docker swarm join --token `etcdctl get keys/swarm/manager-join-token` ${MANAGER_ADVERTISE_ADDR}:2377
+    docker swarm join --token `etcdctl get /swarm/manager-join-token` ${MANAGER_ADVERTISE_ADDR}:2377
   fi
 
 elif [ "$role" == "worker" ]; then
